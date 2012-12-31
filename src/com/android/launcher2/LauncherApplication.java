@@ -25,6 +25,7 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.database.ContentObserver;
 import android.os.Handler;
+import android.os.PowerManager;
 
 import com.android.launcher.R;
 
@@ -37,6 +38,8 @@ public class LauncherApplication extends Application {
     private static float sScreenDensity;
     private static int sLongPressTimeout = 300;
     private static final String sSharedPreferencesKey = "com.android.launcher2.prefs";
+    private PowerManager.WakeLock wlck;
+
     WeakReference<LauncherProvider> mLauncherProvider;
 
     @Override
@@ -73,6 +76,10 @@ public class LauncherApplication extends Application {
         ContentResolver resolver = getContentResolver();
         resolver.registerContentObserver(LauncherSettings.Favorites.CONTENT_URI, true,
                 mFavoritesObserver);
+
+	PowerManager power = (PowerManager) getSystemService(Context.POWER_SERVICE);
+	wlck = power.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "launcher2 lock");
+	wlck.acquire();
     }
 
     /**
